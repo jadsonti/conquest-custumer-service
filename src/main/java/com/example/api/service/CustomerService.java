@@ -27,4 +27,15 @@ public class CustomerService {
 		return repository.findById(id);
 	}
 
+	public List<Customer> findByName(String name) {
+		return repository.findByNameContainingIgnoreCase(name);
+	}
+
+	public List<Customer> findByEmail(String email) {
+		return repository.findByEmailContainingIgnoreCase(email);
+	}
+
+	public List<Customer> findByGender(String gender) {
+		return repository.findByGenderIgnoreCase(gender);
+	}
 }

@@ -9,5 +9,7 @@ import com.example.api.domain.Customer;
 public interface CustomerRepository extends CrudRepository<Customer, Long> {
 
 	List<Customer> findAllByOrderByNameAsc();
-
+	List<Customer> findByNameContainingIgnoreCase(String name);
+	List<Customer> findByEmailContainingIgnoreCase(String email);
+	List<Customer> findByGenderIgnoreCase(String gender);
 }

@@ -35,4 +35,19 @@ public class CustomerController {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
 	}
 
+	@GetMapping("/search/name/{name}")
+	public List<Customer> findByName(@PathVariable String name) {
+		return service.findByName(name);
+	}
+
+	@GetMapping("/search/email/{email}")
+	public List<Customer> findByEmail(@PathVariable String email) {
+		return service.findByEmail(email);
+	}
+
+	@GetMapping("/search/gender/{gender}")
+	public List<Customer> findByGender(@PathVariable String gender) {
+		return service.findByGender(gender);
+	}
+
 }
