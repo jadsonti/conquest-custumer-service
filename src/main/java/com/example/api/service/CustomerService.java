@@ -38,4 +38,23 @@ public class CustomerService {
 	public List<Customer> findByGender(String gender) {
 		return repository.findByGenderIgnoreCase(gender);
 	}
+
+	public Customer createCustomer(Customer customer) {
+		return repository.save(customer);
+	}
+
+	public Customer updateCustomer(Long id, Customer customerDetails) {
+		Customer customer = repository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+		customer.setName(customerDetails.getName());
+		customer.setEmail(customerDetails.getEmail());
+		customer.setGender(customerDetails.getGender());
+		return repository.save(customer);
+	}
+
+	public void deleteCustomer(Long id) {
+		Customer customer = repository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+		repository.delete(customer);
+	}
 }

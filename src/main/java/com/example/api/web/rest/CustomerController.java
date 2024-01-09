@@ -4,10 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.api.domain.Customer;
@@ -48,6 +46,22 @@ public class CustomerController {
 	@GetMapping("/search/gender/{gender}")
 	public List<Customer> findByGender(@PathVariable String gender) {
 		return service.findByGender(gender);
+	}
+
+	@PostMapping
+	public Customer createCustomer(@RequestBody Customer customer) {
+		return service.createCustomer(customer);
+	}
+
+	@PutMapping("update/{id}")
+	public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customerDetails) {
+		return service.updateCustomer(id, customerDetails);
+	}
+
+	@DeleteMapping("delete/{id}")
+	public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
+		service.deleteCustomer(id);
+		return ResponseEntity.ok().build();
 	}
 
 }
