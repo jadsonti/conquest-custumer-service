@@ -6,7 +6,9 @@ import java.util.Optional;
 
 import com.example.api.domain.Address;
 import com.example.api.response.PaginatedResponse;
+import com.example.api.response.ViaCepResponse;
 import com.example.api.service.AddressService;
+import com.example.api.service.ViaCepService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,11 +30,14 @@ public class CustomerController {
 
 	private CustomerService customerService;
 	private final AddressService addressService;
+	private final ViaCepService viaCepService;
+
 
 	@Autowired
-	public CustomerController(CustomerService service, AddressService addressService) {
+	public CustomerController(CustomerService service, AddressService addressService, ViaCepService viaCepService) {
 		this.customerService = service;
 		this.addressService = addressService;
+		this.viaCepService = viaCepService;
 	}
 
 	@GetMapping
@@ -105,7 +110,6 @@ public class CustomerController {
 		customerService.deleteCustomer(id);
 		return ResponseEntity.ok().build();
 	}
-
 	@PostMapping("/{customerId}/addresses")
 	public ResponseEntity<?> addAddressesToCustomer(@PathVariable Long customerId, @RequestBody List<Address> addresses) {
 		Optional<Customer> customerOptional = customerService.findById(customerId);
@@ -116,7 +120,23 @@ public class CustomerController {
 
 		Customer customer = customerOptional.get();
 		List<Address> savedAddresses = new ArrayList<>();
+
 		for (Address address : addresses) {
+			if (address.getCep() != null) {
+				ViaCepResponse viaCepResponse = viaCepService.getAddressByCep(address.getCep());
+				if (viaCepResponse != null) {
+					if (address.getStreet() == null) {
+						address.setStreet(viaCepResponse.getLogradouro());
+					}
+					if (address.getCity() == null) {
+						address.setCity(viaCepResponse.getLocalidade());
+					}
+					if (address.getState() == null) {
+						address.setState(viaCepResponse.getUf());
+					}
+				}
+			}
+
 			address.setCustomer(customer);
 			savedAddresses.add(addressService.saveAddress(address));
 		}
