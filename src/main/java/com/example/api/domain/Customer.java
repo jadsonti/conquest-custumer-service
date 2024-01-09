@@ -5,6 +5,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(name = "CUSTOMER")
@@ -27,6 +28,9 @@ public class Customer {
 	@NotEmpty(message = "O gênero não deve estar vazio")
 	@Pattern(regexp = "M|F|Outro", message = "Gênero deve ser 'M', 'F' ou 'Outro'")
 	private String gender;
+
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Address> addresses;
 
 	public Long getId() {
 		return id;
@@ -58,6 +62,9 @@ public class Customer {
 
 	public void setGender(String gender) {
 		this.gender = gender;
+	}
+
+	public void setAddresses(List<Address> addresses) {
 	}
 
 }

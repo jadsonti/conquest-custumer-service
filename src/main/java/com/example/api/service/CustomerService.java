@@ -3,6 +3,8 @@ package com.example.api.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.api.domain.Address;
+import com.example.api.repository.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,8 @@ public class CustomerService {
 		this.repository = repository;
 	}
 
+	public AddressRepository addressRepository;
+
 	public Page<Customer> findAll(Pageable pageable) {
 		return repository.findAll(pageable);
 	}
@@ -33,16 +37,16 @@ public class CustomerService {
 		return repository.findById(id);
 	}
 
-	public List<Customer> findByName(String name) {
-		return repository.findByNameContainingIgnoreCase(name);
+	public Page<Customer> findByName(String name, Pageable pageable) {
+		return repository.findByNameContainingIgnoreCase(name, pageable);
 	}
 
 	public List<Customer> findByEmail(String email) {
 		return repository.findByEmailContainingIgnoreCase(email);
 	}
 
-	public List<Customer> findByGender(String gender) {
-		return repository.findByGenderIgnoreCase(gender);
+	public Page<Customer> findByGender(String gender, Pageable pageable) {
+		return repository.findByGenderIgnoreCase(gender, pageable);
 	}
 
 	public Customer createCustomer(Customer customer) {

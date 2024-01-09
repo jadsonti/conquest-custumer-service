@@ -1,8 +1,12 @@
 package com.example.api.web.rest;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import com.example.api.domain.Address;
 import com.example.api.response.PaginatedResponse;
+import com.example.api.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,16 +26,18 @@ import javax.validation.Valid;
 @RequestMapping("/customers")
 public class CustomerController {
 
-	private CustomerService service;
+	private CustomerService customerService;
+	private final AddressService addressService;
 
 	@Autowired
-	public CustomerController(CustomerService service) {
-		this.service = service;
+	public CustomerController(CustomerService service, AddressService addressService) {
+		this.customerService = service;
+		this.addressService = addressService;
 	}
 
 	@GetMapping
 	public ResponseEntity<PaginatedResponse<Customer>> findAll(@PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
-		Page<Customer> customerPage = service.findAll(pageable);
+		Page<Customer> customerPage = customerService.findAll(pageable);
 
 		PaginatedResponse<Customer> response = new PaginatedResponse<>();
 		response.setContent(customerPage.getContent());
@@ -45,40 +51,79 @@ public class CustomerController {
 
 	@GetMapping("/{id}")
 	public Customer findById(@PathVariable Long id) {
-		return service.findById(id)
+		return customerService.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
 	}
 
 	@GetMapping("/search/name/{name}")
-	public List<Customer> findByName(@PathVariable String name) {
-		return service.findByName(name);
+	public ResponseEntity<PaginatedResponse<Customer>> findByName(@PathVariable String name,
+																  @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+		Page<Customer> customerPage = customerService.findByName(name, pageable);
+
+		PaginatedResponse<Customer> response = new PaginatedResponse<>();
+		response.setContent(customerPage.getContent());
+		response.setPage(customerPage.getNumber());
+		response.setSize(customerPage.getSize());
+		response.setTotalElements(customerPage.getTotalElements());
+		response.setTotalPages(customerPage.getTotalPages());
+
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/search/email/{email}")
 	public List<Customer> findByEmail(@PathVariable String email) {
-		return service.findByEmail(email);
+		return customerService.findByEmail(email);
 	}
 
 	@GetMapping("/search/gender/{gender}")
-	public List<Customer> findByGender(@PathVariable String gender) {
-		return service.findByGender(gender);
-	}
+	public ResponseEntity<PaginatedResponse<Customer>> findByGender(@PathVariable String gender,
+																	@PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
 
+		Page<Customer> customerPage = customerService.findByGender(gender, pageable);
+
+		PaginatedResponse<Customer> response = new PaginatedResponse<>();
+		response.setContent(customerPage.getContent());
+		response.setPage(customerPage.getNumber());
+		response.setSize(customerPage.getSize());
+		response.setTotalElements(customerPage.getTotalElements());
+		response.setTotalPages(customerPage.getTotalPages());
+
+		return ResponseEntity.ok(response);
+	}
 	@PostMapping
 	public Customer createCustomer(@Valid @RequestBody Customer customer) {
-		return service.createCustomer(customer);
+		return customerService.createCustomer(customer);
 	}
 
 	@PutMapping("update/{id}")
 	public Customer updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customerDetails) {
-		return service.updateCustomer(id, customerDetails);
+		return customerService.updateCustomer(id, customerDetails);
 	}
 
 	@DeleteMapping("delete/{id}")
 	public ResponseEntity<?> deleteCustomer(@Valid @PathVariable Long id) {
-		service.deleteCustomer(id);
+		customerService.deleteCustomer(id);
 		return ResponseEntity.ok().build();
 	}
+
+	@PostMapping("/{customerId}/addresses")
+	public ResponseEntity<?> addAddressesToCustomer(@PathVariable Long customerId, @RequestBody List<Address> addresses) {
+		Optional<Customer> customerOptional = customerService.findById(customerId);
+
+		if (!customerOptional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente não encontrado");
+		}
+
+		Customer customer = customerOptional.get();
+		List<Address> savedAddresses = new ArrayList<>();
+		for (Address address : addresses) {
+			address.setCustomer(customer);
+			savedAddresses.add(addressService.saveAddress(address));
+		}
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(savedAddresses);
+	}
+
 
 
 }
