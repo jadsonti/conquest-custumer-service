@@ -3,6 +3,7 @@ package com.example.api.domain;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -24,6 +25,7 @@ public class Customer {
 
 	@Column(nullable = false)
 	@NotEmpty(message = "O gênero não deve estar vazio")
+	@Pattern(regexp = "M|F|Outro", message = "Gênero deve ser 'M', 'F' ou 'Outro'")
 	private String gender;
 
 	public Long getId() {
