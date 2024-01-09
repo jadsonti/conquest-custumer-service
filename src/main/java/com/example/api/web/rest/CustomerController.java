@@ -11,6 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.api.domain.Customer;
 import com.example.api.service.CustomerService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
@@ -49,17 +51,17 @@ public class CustomerController {
 	}
 
 	@PostMapping
-	public Customer createCustomer(@RequestBody Customer customer) {
+	public Customer createCustomer(@Valid @RequestBody Customer customer) {
 		return service.createCustomer(customer);
 	}
 
 	@PutMapping("update/{id}")
-	public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customerDetails) {
+	public Customer updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customerDetails) {
 		return service.updateCustomer(id, customerDetails);
 	}
 
 	@DeleteMapping("delete/{id}")
-	public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
+	public ResponseEntity<?> deleteCustomer(@Valid @PathVariable Long id) {
 		service.deleteCustomer(id);
 		return ResponseEntity.ok().build();
 	}

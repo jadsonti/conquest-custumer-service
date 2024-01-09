@@ -3,6 +3,7 @@ package com.example.api.domain;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "CUSTOMER")
@@ -13,15 +14,16 @@ public class Customer {
 	private Long id;
 
 	@Column(nullable = false)
+	@Size(min = 2, message = "O nome deve ter pelo menos 2 caracteres")
 	private String name;
 
 	@Column(nullable = false)
 	@NotEmpty
-	@Email
+	@Email(message = "O email deve ser válido")
 	private String email;
 
 	@Column(nullable = false)
-	@NotEmpty
+	@NotEmpty(message = "O gênero não deve estar vazio")
 	private String gender;
 
 	public Long getId() {
