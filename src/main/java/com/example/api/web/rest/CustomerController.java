@@ -144,6 +144,30 @@ public class CustomerController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedAddresses);
 	}
 
+	@GetMapping("/search/city/{city}")
+	public ResponseEntity<PaginatedResponse<Customer>> findByCity(@PathVariable String city,
+																  @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
 
+		Page<Customer> customerPage = customerService.findByCity(city, pageable);
+		return buildPaginatedResponse(customerPage);
+	}
+
+	@GetMapping("/search/state/{state}")
+	public ResponseEntity<PaginatedResponse<Customer>> findByState(@PathVariable String state,
+																   @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+
+		Page<Customer> customerPage = customerService.findByState(state, pageable);
+		return buildPaginatedResponse(customerPage);
+	}
+
+	private ResponseEntity<PaginatedResponse<Customer>> buildPaginatedResponse(Page<Customer> customerPage) {
+		PaginatedResponse<Customer> response = new PaginatedResponse<>();
+		response.setContent(customerPage.getContent());
+		response.setPage(customerPage.getNumber());
+		response.setSize(customerPage.getSize());
+		response.setTotalElements(customerPage.getTotalElements());
+		response.setTotalPages(customerPage.getTotalPages());
+		return ResponseEntity.ok(response);
+	}
 
 }

@@ -15,8 +15,11 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 	List<Customer> findAllByOrderByNameAsc();
 	List<Customer> findByEmailContainingIgnoreCase(String email);
 	Page<Customer> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
 	Page<Customer> findByGenderIgnoreCase(String gender, Pageable pageable);
+	@Query("SELECT c FROM Customer c JOIN c.addresses a WHERE LOWER(a.city) = LOWER(:city)")
+	Page<Customer> findByCity(@Param("city") String city, Pageable pageable);
 
+	@Query("SELECT c FROM Customer c JOIN c.addresses a WHERE LOWER(a.state) = LOWER(:state)")
+	Page<Customer> findByStateInAddresses(@Param("state") String state, Pageable pageable);
 
 }
